@@ -392,6 +392,89 @@
                     <mainClass>org.test.int1.Main</mainClass>
                 </configuration>
             </plugin>
+            
+            <!-- EMMA -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>emma-maven-plugin</artifactId>
+				<version>1.0-alpha-1</version>
+			</plugin>
+			<!-- PMD manven plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
         </plugins>
     </build>
+    <reporting>
+		<outputDirectory>${basedir}/target/site</outputDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.0.1</version>
+				<reportSets>
+					<reportSet>
+						<id>sunlink</id>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+						<inherited>true</inherited>
+						<configuration>
+							<links>
+								<link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+							</links>
+						</configuration>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- JUnit Test Results & EMMA Coverage Reporting -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>emma-maven-plugin</artifactId>
+				<inherited>true</inherited>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>surefire-report-maven-plugin</artifactId>
+				<inherited>true</inherited>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- PMD manven plugin -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-pmd-plugin</artifactId> 
+				<version>2.4</version> <configuration> <rulesets> <ruleset>./Ruleset.xml</ruleset> 
+				</rulesets> <linkXref>true</linkXref> <sourceEncoding>${encoding}</sourceEncoding> 
+				<minimumTokens>100</minimumTokens> <targetJdk>${compileSource}</targetJdk> 
+				</configuration> <reportSets> <reportSet> <reports> <report>pmd</report> 
+				</reports> </reportSet> </reportSets> </plugin> -->
+			<!-- Generating JavaDoc Report -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<minmemory>128m</minmemory>
+					<maxmemory>512m</maxmemory>
+					<encoding>${encoding}</encoding>
+					<docencoding>${encoding}</docencoding>
+					<charset>${encoding}</charset>
+				</configuration>
+			</plugin>
+			<!-- Generating Java Source in HTML -->
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<configuration>
+					<inputEncoding>${encoding}</inputEncoding>
+					<outputEncoding>${encoding}</outputEncoding>
+					<linkJavadoc>true</linkJavadoc>
+					<javadocDir>apidocs</javadocDir>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
