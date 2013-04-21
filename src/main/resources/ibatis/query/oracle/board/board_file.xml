@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="board_file">
+	<typeAlias alias="board_file" type="com.jkonury.www.board.model.BoardFile"/>
+	
+	<resultMap class="board_file" id="board_file_map">
+		<result property="fileSeq" column="file_seq"/>
+		<result property="boardSeq" column="board_seq"/>
+		<result property="userSeq" column="user_seq"/>
+		<result property="filePath" column="file_path"/>
+		<result property="orgFileName" column="org_file_name"/>
+		<result property="copyFileName" column="copy_file_name"/>
+		<result property="fileSize" column="file_size"/>
+		<result property="fileExt" column="file_ext"/>
+		<result property="rmYn" column="rm_yn"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="rmDate" column="rm_date"/>
+		<result property="downCount" column="down_count"/>
+	</resultMap>
+	
+	<sql id="board_file_select">
+		SELECT
+		    file_seq,
+		    board_seq,
+		    user_seq,
+		    file_path,
+		    org_file_name,
+		    copy_file_name,
+		    file_size,
+		    file_ext,
+		    rm_yn,
+		    to_char(reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+			to_char(rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date,
+		    down_count
+		FROM board_file
+		WHERE rm_yn = 'N'
+	</sql>	
+	
+	<insert id="add" parameterClass="board_file">
+		INSERT INTO board_file
+					(	file_seq, 				 board_seq,  user_seq,  file_path,  org_file_name, copy_file_name, file_size,  file_ext		)
+			VALUES	(	board_file_seq.nextval, #boardSeq#, #userSeq#, #filePath#, #orgFileName#, #copyFileName#, #fileSize#, #fileExt#		)
+		<selectKey resultClass="int">
+			SELECT board_file_seq.currval from dual
+		</selectKey>
+	</insert>
+	
+	<select id="get" parameterClass="int" resultMap="board_file_map">
+		<include refid="board_file_select"/>
+		AND board_seq = #value#
+	</select>
+	
+	<update id="delete" parameterClass="board_file">
+		UPDATE board_file
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE board_seq = #boardSeq#
+	</update>
+	
+	<update id="deleteById" parameterClass="int">
+		UPDATE board_file
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE board_seq = #value#
+	</update>
+	
+	 <delete id="deleteAll">
+		DELETE FROM board_file
+	</delete>
+	
+	<select id="getCount" resultClass="int">
+		SELECT COUNT(*) FROM board_file WHERE rm_yn = 'N'
+	</select>
+</sqlMap>

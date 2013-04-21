@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="board">
+	<typeAlias alias="board" type="com.jkonury.www.board.model.Board"/>
+	<resultMap class="board" id="boardMap">
+		<result property="boardSeq" column="board_seq"/>
+		<result property="tableSeq" column="table_seq"/>
+		<result property="userSeq" column="user_seq"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="passwd" column="passwd"/>
+		<result property="userName" column="name"/>
+		<result property="inquiryCount" column="inquiry_count"/>
+		<result property="hasFile" column="has_file"/>
+		<result property="ip" column="ip"/>
+		<result property="replyCount" column="reply_count"/>
+		<result property="rmYn" column="rm_yn"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="rmDate" column="rm_date"/>
+	</resultMap>
+	
+	<sql id="board_select">
+		SELECT
+		    b.board_seq,
+		    b.table_seq,
+		    b.user_seq,
+		    b.title,
+		    b.content,
+		    b.passwd,
+		    u.name,
+		    b.rm_yn,
+		    to_char(b.reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+			to_char(b.rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date,
+		    b.inquiry_count,
+		    b.has_file,
+		    b.ip,
+		    b.reply_count
+		FROM board b
+			INNER JOIN users u ON (b.user_seq = u.user_seq)
+		WHERE b.rm_yn = 'N'
+	</sql>
+	
+	<insert id="add" parameterClass="board">
+		INSERT INTO board
+					( board_seq, table_seq,  user_seq,   title,   content,   passwd,   has_file,   ip		)
+			VALUES	( board_seq.nextval, #tableSeq#, #userSeq#, #title#,  #content#, #passwd#, #hasFile#,  #ip#	)
+		<selectKey resultClass="int">
+			SELECT board_seq.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<select id="get" parameterClass="int" resultMap="boardMap">
+		<include refid="board_select"/>
+		AND  board_seq = #value#
+	</select>
+	
+	<update id="update" parameterClass="board">
+		UPDATE board
+			SET 
+				table_seq = #tableSeq#,
+				title = #title#,
+				content = #content#,
+				passwd = #passwd#,
+				has_file = #hasFile#,
+				ip = #ip#, 
+				inquiry_count = #inquiryCount#
+			WHERE board_seq = #boardSeq#
+	</update>
+	
+	<update id="delete" parameterClass="board">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE board_seq = #boardSeq#
+	</update>
+	
+	<update id="deleteById" parameterClass="int">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE board_seq = #value#
+	</update>
+	
+	<select id="getAll" parameterClass="board" resultMap="boardMap">
+		
+			SELECT QRY.* 
+			FROM (
+				SELECT
+				ROWNUM rnum,
+			    b.board_seq,
+			    b.table_seq,
+			    b.user_seq,
+			    b.title,
+			    b.content,
+			    b.passwd,
+			    u.name,
+			    b.rm_yn,
+			    to_char(b.reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+				to_char(b.rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date,
+			    b.inquiry_count,
+			    b.has_file,
+			    b.ip,
+			    b.reply_count
+			FROM board b
+				INNER JOIN users u ON (b.user_seq = u.user_seq)
+			WHERE b.rm_yn = 'N'
+			AND  b.table_seq = #tableSeq#
+			
+			ORDER BY board_seq DESC
+			) QRY
+		<![CDATA[
+			WHERE rnum >= $startPage$ and rnum <= $endPage$	
+		]]>
+	</select>
+	
+	<select id="search" parameterClass="board" resultMap="boardMap">
+	
+		SELECT QRY.* 
+		FROM (
+			SELECT
+			ROWNUM rnum,
+		    b.board_seq,
+		    b.table_seq,
+		    b.user_seq,
+		    b.title,
+		    b.content,
+		    b.passwd,
+		    u.name,
+		    b.rm_yn,
+		    to_char(b.reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+			to_char(b.rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date,
+		    b.inquiry_count,
+		    b.has_file,
+		    b.ip,
+		    b.reply_count
+		FROM board b
+			INNER JOIN users u ON (b.user_seq = u.user_seq)
+		WHERE b.rm_yn = 'N'
+		AND  b.table_seq = #tableSeq#
+		<isNotNull property="searchType">
+			<isEqual property="searchType" compareValue="all" open="AND">
+			(
+				b.title LIKE '%' || #searchWord# || '%' 
+			OR b.content LIKE '%' || #searchWord# || '%'
+			OR u.name LIKE '%' || #searchWord# || '%' 
+			)
+			</isEqual>
+			<isEqual property="searchType" compareValue="title" open="AND">
+				b.title LIKE '%' || #searchWord# || '%' 
+			</isEqual>
+			<isEqual property="searchType" compareValue="content" open="AND">
+				b.content LIKE '%' || #searchWord# || '%'
+			</isEqual>
+			<isEqual property="searchType" compareValue="name" open="AND">
+				u.name LIKE '%' || #searchWord# || '%' 
+			</isEqual>
+		</isNotNull>
+		ORDER BY board_seq DESC
+		) QRY
+		<![CDATA[
+		WHERE rnum >= $startPage$ and rnum <= $endPage$	
+		]]>
+	</select>
+	
+	<!-- 
+	<insert id="insertList" parameterClass="score">
+		INSERT INTO scoreboard
+					(	 name, 	 kor,   eng,   math,   total,   avg		)
+			VALUES 	(	#name#, #kor#, #eng#, #math#, #total#, #avg#	)
+			<iterate open="(" close=")" conjunction=",">
+						#name#, #kor#, #eng#, #math#, #total#, #avg#
+			</iterate>
+	</insert>
+	 -->
+	 
+	 <delete id="deleteAll">
+		DELETE FROM board
+	</delete>
+	
+	<select id="getCount" parameterClass="board" resultClass="int">
+		SELECT COUNT(*) 
+		FROM board b 
+			INNER JOIN users u ON (b.user_seq = u.user_seq)
+		WHERE b.rm_yn = 'N' AND b.table_seq = #tableSeq#
+		<isNotNull property="searchType">
+			<isEqual property="searchType" compareValue="all" open="AND">
+			(
+				b.title LIKE '%' || #searchWord# || '%' 
+			OR b.content LIKE '%' || #searchWord# || '%'
+			OR u.name LIKE '%' || #searchWord# || '%'
+			)
+			</isEqual>
+			<isEqual property="searchType" compareValue="title" open="AND">
+				b.title LIKE '%' || #searchWord# || '%' 
+			</isEqual>
+			<isEqual property="searchType" compareValue="content" open="AND">
+				b.content LIKE '%' || #searchWord# || '%'
+			</isEqual>
+			<isEqual property="searchType" compareValue="name" open="AND">
+				u.name LIKE '%' || #searchWord# || '%'
+			</isEqual>
+		</isNotNull>
+	</select>
+</sqlMap>

@@ -1,0 +1,48 @@
+@CHARSET "UTF-8";
+
+/* 검색 */
+.search{width:100%;padding:5px 0}
+.search legend{overflow:hidden;visibility:hidden;position:absolute;top:0;left:0;width:1px;height:1px;font-size:0;line-height:0}
+.search{color:#c4c4c4;text-align:center}
+.search select,.search input{margin:-1px 0 1px;font-size:12px;color:#373737;vertical-align:middle}
+.search .keyword{margin-left:1px;padding:2px 3px 5px;border:1px solid #b5b5b5;font-size:12px;line-height:15p}
+
+
+/* 테이블 */
+
+
+.tbl_type,.tbl_type th,.tbl_type td{border:0}
+.tbl_type a{color:#383838;text-decoration:none}
+.tbl_type{width:100%;border-bottom:1px solid #999;color:#666;font-size:12px;table-layout:fixed}
+.tbl_type caption,.tbl_type .frm label{display:none}
+.tbl_type th{padding:5px 0 4px;border-top:solid 1px #999;border-bottom:solid 1px #b2b2b2;background-color:#f1f1f4;color:#333;font-weight:bold;line-height:18px;vertical-align:top}
+.tbl_type td{padding:8px 0 5px;border-bottom:solid 1px #d2d2d2;text-align:center}
+.tbl_type .frm{padding:0;text-align:center}
+.tbl_type .frm input{margin:0}
+.tbl_type .num,.tbl_type .date,.tbl_type .hit{padding:0;font-family:Tahoma;font-size:11px;line-height:normal}
+.tbl_type .title{text-align:left}
+.tbl_type .title .pic,.tbl_type .title .new{margin:0 0 2px;vertical-align:middle}
+.tbl_type tr.reply .title a{padding-left:12px;background:url(../images/ic_reply.gif) 0 1px no-repeat}
+.tbl_type tr.reply td a.comment{padding:0;background:none;color:#f00;font-size:12px;font-weight:bold}
+
+.paginate_regular{padding:15px 0;text-align:center;line-height:normal}
+.paginate_regular a,
+.paginate_regular strong{display:inline-block;position:relative;margin:0 -2px;padding:2px 8px;font-weight:bold;font-size:12px;font-family:Tahoma, Sans-serif;color:#333;line-height:normal;text-decoration:none;vertical-align:middle}
+.paginate_regular a:hover,
+.paginate_regular a:active,
+.paginate_regular a:focus{background-color:#f8f8f8}
+.paginate_regular strong{color:#f60}
+.paginate_regular .direction{font-weight:normal;color:#767676;white-space:nowrap}
+.paginate_regular .direction span{font-weight:bold;font-size:14px}
+.paginate_regular .direction:hover,
+.paginate_regular .direction:active,
+.paginate_regular .direction:focus{background-color:#fff;color:#333}
+
+/* 페이징 
+.paging				{ text-align:center;  }
+.paging a			{ color:#adadad !important; }
+.paging span		{ margin:0 5px; }
+.paging span a		{ padding:1px 4px; display:inline-block; 	font-weight:bold; }
+.paging b			{ padding:1px 4px; display:inline-block; color:#5dd7d0; }
+.paging img			{ vertical-align:-3px; }
+*/

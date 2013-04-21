@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="board_reply">
+	<typeAlias alias="board_reply" type="com.jkonury.www.board.model.BoardReply"/>
+	
+	<resultMap class="board_reply" id="board_reply_map">
+		<result property="replySeq" column="reply_seq"/>
+		<result property="boardSeq" column="board_seq"/>
+		<result property="userSeq" column="user_seq"/>
+		<result property="userName" column="user_name"/>
+		<result property="content" column="content"/>
+		<result property="rmYn" column="rm_yn"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="rmDate" column="rm_date"/>
+		<result property="recommend" column="recommend"/>
+		<result property="ip" column="ip"/>
+	</resultMap>
+	
+	<sql id="board_reply_select">
+		SELECT
+		    b.reply_seq,
+		    b.board_seq,
+		    b.user_seq,
+		    b.content,
+		    b.rm_yn,
+		    u.name AS user_name, 
+		    DATE_FORMAT(b.reg_date, '%Y-%m-%d %H:%i:%s') AS reg_date,
+			DATE_FORMAT(b.rm_date, '%Y-%m-%d %H:%i:%s') AS rm_date,
+		    b.recommend,
+		    b.ip
+		FROM board_reply b INNER JOIN users u ON (b.user_seq = u.user_seq)
+		WHERE b.rm_yn = 'N'
+	</sql>
+	
+	<insert id="add" parameterClass="board_reply">
+		INSERT INTO board_reply
+					(	 board_seq,  user_seq,  content,    recommend,   ip)
+			VALUES	(	#boardSeq#, #userSeq#, #content#,  #recommend#, #ip#)
+		<selectKey resultClass="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<select id="get" parameterClass="int" resultMap="board_reply_map">
+		<include refid="board_reply_select"/>
+		AND  b.reply_seq = #value#
+	</select>
+	
+	<update id="delete" parameterClass="board_reply">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = NOW()
+			WHERE reply_seq = #replySeq#
+	</update>
+	
+	<update id="deleteById" parameterClass="int">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = NOW()
+			WHERE reply_seq = #value#
+	</update>
+	
+	<select id="getAll" parameterClass="board_reply" resultMap="board_reply_map">
+		<include refid="board_reply_select"/>
+		AND  b.board_seq = #boardSeq#
+	</select>
+	
+	<select id="search" parameterClass="board_reply" resultMap="board_reply_map">
+		<include refid="board_reply_select"/>
+		AND  b.board_seq = #boardSeq#
+			<!-- <isEqual property="paging.searchKey" compareValue="all" open="AND">
+				title LIKE CONCAT('%', #searchVal#, '%') 
+			AND content LIKE CONCAT('%', #searchVal#, '%') 
+			</isEqual>
+			<isEqual property="paging.searchKey" compareValue="title" open="AND">
+				title LIKE CONCAT('%', #searchVal#, '%') 
+			</isEqual>
+			<isEqual property="paging.searchKey" compareValue="content" open="AND">
+				content LIKE CONCAT('%', #searchVal#, '%')
+			</isEqual> -->
+	</select>
+	
+	<!-- 
+	<insert id="insertList" parameterClass="score">
+		INSERT INTO scoreboard
+					(	 name, 	 kor,   eng,   math,   total,   avg		)
+			VALUES 	(	#name#, #kor#, #eng#, #math#, #total#, #avg#	)
+			<iterate open="(" close=")" conjunction=",">
+						#name#, #kor#, #eng#, #math#, #total#, #avg#
+			</iterate>
+	</insert>
+	 -->
+	 
+	 <delete id="deleteAll">
+		DELETE FROM board_reply
+	</delete>
+	
+	<select id="getCount" parameterClass="int" resultClass="int">
+		SELECT COUNT(*) FROM board_reply WHERE rm_yn = 'N' AND board_seq = #value#
+	</select>
+</sqlMap>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="user">
+	<typeAlias alias="user" type="com.jkonury.www.user.model.User"/>
+	
+	<resultMap class="user" id="userMap">
+		<result property="userSeq" column="user_seq"/>
+		<result property="id" column="id"/>
+		<result property="passwd" column="passwd"/>
+		<result property="email" column="email"/>
+		<result property="name" column="name"/>
+		<result property="tel" column="tel"/>
+		<result property="phone" column="phone"/>
+		<result property="role" column="role"/>
+		<result property="rmYn" column="rm_yn"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="modifiedDate" column="modified_date"/>
+		<result property="rmDate" column="rm_date"/>
+		<result property="zipCode" column="zip_code"/>
+		<result property="dftAddr" column="dft_addr"/>
+		<result property="dtlAddr" column="dtl_addr"/>
+		<result property="loginCount" column="login_count" />
+	</resultMap>
+	
+	<sql id="user_select">
+		SELECT
+		    user_seq,
+		    id,
+		    passwd,
+		    email,
+		    name,
+		    tel,
+		    phone,
+		    role,
+		    rm_yn,
+		    to_char(reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+			to_char(modified_date, 'yyyy-MM-dd HH24:MI:SS') AS modified_date,
+		    to_char(rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date,
+		    zip_code,
+		    dft_addr,
+		    dtl_addr,
+		    login_count
+		FROM users
+		WHERE rm_yn = 'N'
+	</sql>
+	
+	<insert id="add" parameterClass="user">
+		INSERT INTO users
+				( user_seq,  		  id,   passwd,   email,   name,   tel,   phone,   role,   zip_code,  dft_addr,  dtl_addr	)
+		VALUES	( user_seq.nextval,  #id#, #passwd#, #email#, #name#, #tel#, #phone#, #role#, #zipCode#, #dftAddr#, #dtlAddr#	)
+		
+		<selectKey resultClass="int">
+			SELECT user_seq.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<select id="get" parameterClass="int" resultMap="userMap">
+		<include refid="user_select"/>
+		AND user_seq = #value#
+	</select>
+	
+	<update id="update" parameterClass="user">
+		UPDATE users
+			SET 
+			    passwd 	= #passwd#,
+			    email 	= #email#,
+			    name 	= #name#,
+			    tel 	= #tel#,
+			    phone 	= #phone#,
+			    role 	= #role#,
+			    modified_date = SYSDATE,
+			    zip_code = #zipCode#,
+			    dft_addr = #dftAddr#,
+			    dtl_addr = #dtlAddr#, 
+			    login_count = #loginCount#
+			WHERE user_seq = #userSeq#
+	</update>
+	
+	<update id="delete" parameterClass="user">
+		UPDATE users
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE user_seq = #userSeq#
+	</update>
+	
+	<update id="deleteById" parameterClass="int">
+		UPDATE users
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE user_seq = #value#
+	</update>
+	
+	<select id="getAll" parameterClass="user" resultMap="userMap">
+		<include refid="user_select"/>
+		AND 1 = 1
+	</select>
+	
+	<select id="search" parameterClass="user" resultMap="userMap">
+		<include refid="user_select"/>
+		AND 1 = 1
+	</select>
+	
+	<delete id="deleteAll">
+		DELETE FROM users
+	</delete>
+	
+	<select id="getCount" resultClass="int">
+		SELECT COUNT(*) FROM users WHERE rm_yn = 'N'
+	</select>
+	
+	<select id="findUser" parameterClass="java.lang.String" resultMap="userMap">
+		<include refid="user_select"/>
+		AND id = #value#
+	</select>
+</sqlMap>
+

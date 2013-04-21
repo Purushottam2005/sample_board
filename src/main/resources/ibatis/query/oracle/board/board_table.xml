@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="board_table">
+	<typeAlias alias="board_table" type="com.jkonury.www.board.model.BoardTable"/>
+	
+	<resultMap class="board_table" id="board_table_map">
+		<result property="tableSeq" column="table_seq"/>
+		<result property="boardId" column="board_id"/>
+		<result property="boardName" column="board_name"/>
+		<result property="boardDesc" column="board_desc"/>
+		<result property="boardTheme" column="board_theme"/>
+		<result property="rmYn" column="rm_yn"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="rmDate" column="rm_date"/>
+	</resultMap>
+	
+	<sql id="board_table_select">
+		SELECT
+		    table_seq,
+		    board_id,
+		    board_name,
+		    board_desc,
+		    board_theme,
+		    rm_yn,
+		    to_char(reg_date, 'yyyy-MM-dd HH24:MI:SS') AS reg_date,
+			to_char(rm_date, 'yyyy-MM-dd HH24:MI:SS') AS rm_date
+		FROM board_table
+		WHERE rm_yn = 'N'
+	</sql>
+	
+	<insert id="add" parameterClass="board_table">
+		INSERT INTO board_table
+				(	table_seq, 				  board_id,  board_name,  board_desc,  board_theme	)
+		VALUES	(	board_table_seq.nextval, #boardId#, #boardName#, #boardDesc#, #boardTheme#	)
+		<selectKey resultClass="int">
+			SELECT board_table_seq.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<select id="get" parameterClass="int" resultMap="board_table_map">
+		<include refid="board_table_select"/>
+		AND  table_seq = #value#
+	</select>
+	
+	<update id="update" parameterClass="board_table">
+		UPDATE board_table
+			SET 
+			    board_id = #boardId#,
+			    board_name = #boardName#,
+			    board_desc = #boardDesc#,
+			    board_theme = #boardTheme#
+			WHERE table_seq = #tableSeq#
+	</update>
+	
+	<update id="delete" parameterClass="board_table">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE table_seq = #tableSeq#
+	</update>
+	
+	<update id="deleteById" parameterClass="int">
+		UPDATE board
+			SET 
+				rm_yn = 'Y',
+			    rm_date = SYSDATE
+			WHERE table_seq = #value#
+	</update>
+	
+	<select id="getAll" resultMap="board_table_map">
+		<include refid="board_table_select"/>
+	</select>
+	
+	<select id="search" resultMap="board_table_map">
+		<include refid="board_table_select"/>
+			<!-- <isEqual property="paging.searchKey" compareValue="all" open="AND">
+				title LIKE CONCAT('%', #searchVal#, '%') 
+			AND content LIKE CONCAT('%', #searchVal#, '%') 
+			</isEqual>
+			<isEqual property="paging.searchKey" compareValue="title" open="AND">
+				title LIKE CONCAT('%', #searchVal#, '%') 
+			</isEqual>
+			<isEqual property="paging.searchKey" compareValue="content" open="AND">
+				content LIKE CONCAT('%', #searchVal#, '%')
+			</isEqual> -->
+	</select>
+	
+	<!-- 
+	<insert id="insertList" parameterClass="score">
+		INSERT INTO scoreboard
+					(	 name, 	 kor,   eng,   math,   total,   avg		)
+			VALUES 	(	#name#, #kor#, #eng#, #math#, #total#, #avg#	)
+			<iterate open="(" close=")" conjunction=",">
+						#name#, #kor#, #eng#, #math#, #total#, #avg#
+			</iterate>
+	</insert>
+	 -->
+	 
+	 <delete id="deleteAll">
+		DELETE FROM board_table
+	</delete>
+	
+	<select id="getCount" resultClass="int">
+		SELECT COUNT(*) FROM board_table WHERE rm_yn = 'N'
+	</select>
+	
+	<select id="findByBoardId" parameterClass="String" resultMap="board_table_map">
+		<include refid="board_table_select"/>
+		AND board_id LIKE '' || #value# || ''
+	</select>
+</sqlMap>
